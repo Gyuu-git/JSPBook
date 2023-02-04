@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+  <display-name>JSPBook</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  
+  <!-- role : 권한, tomcat-users.xml에서 등록한 role만 사용 가능 -->
+  <security-role>
+	<role-name>role1</role-name>
+  </security-role>
+  <security-role>
+	<role-name>tomcat</role-name>
+  </security-role>
+  <security-role>
+	<role-name>manager</role-name>
+  </security-role>
+  <!-- 상품관리자 권한 추가 -->
+  <security-role>
+	<role-name>admin</role-name>
+  </security-role>
+  <!-- constraint : 제약사항(약속) -->
+  <security-constraint>
+  	<!-- 웹 자원(프로젝트명, 접근제한을 할 대상 URL)에 대한 약속 목록 -->
+  	<web-resource-collection>
+  		<web-resource-name>JSPBook</web-resource-name>
+  		<url-pattern>/ch10/security01.jsp</url-pattern>
+  		<http-method>GET</http-method>
+  	</web-resource-collection>
+  	<!-- 웹 자원에 권한이 부여된 사용자만이 접근할 수 있도록 설정 -->
+  	<auth-constraint>
+		<description></description>
+		<!-- 
+		role1 권한을 가진 role1, both 사용자의 경우
+		아이디(both)와 비밀번호(jave)를 맞게 입력했다면
+		/ch10/security01.jsp URL로 접근 가능.
+		반드시 tomcat-users.xml에 등록된 role(역할/권한)과 사용자여야 함
+		만약 모든 사용자에게 권한을 부여하려면 *로 표시
+		-->
+		<role-name>role1</role-name>
+  	</auth-constraint>
+  	<!-- 
+	인증(authetication) : 로그인
+	인가(authrization) : 권한(로그인 된 상태)
+	인증 : 인가 = 1 : N
+	
+	* 관계차수
+	- 1 : 1
+	- 1 : N 90% 이상 차지
+	- N : M (다대다 관계는 RDB에서는 구현 불가. 1:N으로 해소)
+  	-->
+  </security-constraint>
+  
+  <!-- ch09/모든.jsp 에 접근하려면 tomcat 권한이 있어야함
+  	tomcat 권한을 갖고있는 user는 tomcat, both
+  -->
+  <security-constraint>
+  	<web-resource-collection>
+  		<web-resource-name>JSPBook</web-resource-name>
+  		<url-pattern>/ch09/*</url-pattern>
+  		<http-method>GET</http-method>
+  	</web-resource-collection>
+  	<auth-constraint>
+		<description></description>
+		<role-name>tomcat</role-name>
+  	</auth-constraint>
+  </security-constraint>
+  
+  <!-- 
+  	상품을 추가할 수 있는 URL인 /addProduct.jsp에 접근하려면
+  	admin이라는 권한이 있어야 함.
+  	admin이라는 권한을 갖고 있는 user는 jsg 회원이 있음
+  -->
+<!--   <security-constraint> -->
+<!--   	<web-resource-collection> -->
+<!--   		<web-resource-name>JSPBook</web-resource-name> -->
+<!--   		<url-pattern>/addProduct.jsp</url-pattern> -->
+<!--   		<http-method>GET</http-method> -->
+<!--   	</web-resource-collection> -->
+<!--   	<auth-constraint> -->
+<!-- 		<description></description> -->
+<!-- 		<role-name>admin</role-name> -->
+<!--   	</auth-constraint> -->
+<!--   </security-constraint> -->
+  
+<!--   <security-constraint> -->
+<!--   	<web-resource-collection> -->
+<!--   		<web-resource-name>JSPBook</web-resource-name> -->
+<!--   		<url-pattern>/cart.jsp</url-pattern> -->
+<!--   		<http-method>GET</http-method> -->
+<!--   	</web-resource-collection> -->
+<!--   	<auth-constraint> -->
+<!-- 		<description></description> -->
+<!-- 		<role-name>manager</role-name> -->
+<!--   	</auth-constraint> -->
+<!--   </security-constraint> -->
+  
+  <!-- login-config
+  인증(authentication) 처리를 위한 로그인 페이지나 오류 페이지를 호출하는데 사용함
+  로그인 관련 메시지를 표시할 수 있음
+  -->
+  <login-config>
+  	<!-- 로그인 페이지를 기본으로 제공 -->
+<!-- 	<auth-method>BASIC</auth-method> -->
+	<auth-method>FORM</auth-method>
+	<!-- 사용자 정의 FROM 인증 처리 기법 설정 -->
+	<form-login-config>
+		<!-- 로그인 페이지 -->
+		<form-login-page>/login.jsp</form-login-page>
+		<!-- 로그인 실패 시 보여줄 페이지 -->
+		<form-error-page>/login_failed.jsp</form-error-page>
+	</form-login-config>
+  </login-config>
+  
+  <!-- 오류가 나면 오류 타입(404, 500)에 맞춰 오류 처리 jsp로 매핑 -->
+  <!-- 404 : page not found. URL에 해당되는 jsp가 없음 -->
+  <error-page>
+  	<error-code>404</error-code>
+  	<location>/error/error404.jsp</location>
+  </error-page>
+  <!-- 500 : 프로그래밍 오류 -->
+  <error-page>
+  	<error-code>500</error-code>
+  	<location>/error/error500.jsp</location>
+  </error-page>
+  
+  <error-page>
+  	<exception-type>java.lang.NullPointerException</exception-type>
+  	<location>/error/errorNullPointer.jsp</location>
+  </error-page>
+  
+  <!-- 
+  	filter/filter-mapping은 같이.
+  	filter-name으로 연결
+   -->
+   <!-- java의 세계와 톰켓의 세계를 연결 -->
+   <!-- 모든 요청/응답 사이에 AuthenFilter가 동작 -->
+  <filter>
+  	<filter-name>filter01</filter-name>
+  	<!-- filter-class는 java 클래스 / src 패키지 다음부터. -->
+  	<filter-class>filter.AuthenFilter</filter-class>
+  </filter>
+  <filter-mapping>
+  	<filter-name>filter01</filter-name>
+  	<!-- 도착지 -->
+  	<url-pattern>/ch12/filter01_process.jsp</url-pattern>
+  </filter-mapping>
+  
+  <!-- 파라미터를 InitParamFilter클래스의 init메서드로 던짐 -->
+  <filter>
+  	<filter-name>filter02</filter-name>
+  	<filter-class>filter.InitParamFilter</filter-class>
+  	<!-- 관리자 아이디 / 비밀번호를 세팅 (잘 안씀) -->
+  	<init-param>
+  		<param-name>param1</param-name>
+  		<param-value>admin</param-value>
+  	</init-param>
+  	<init-param>
+  		<param-name>param2</param-name>
+  		<param-value>1234</param-value>
+  	</init-param>
+  </filter>
+  <filter-mapping>
+  	<filter-name>filter02</filter-name>
+  	<url-pattern>/ch12/filter02_process.jsp</url-pattern>
+  </filter-mapping>
+  
+  <filter>
+  	<filter-name>filter02_2</filter-name>
+  	<filter-class>filter.LogFileFilter</filter-class>
+  	
+  	<init-param>
+  		<param-name>filename</param-name>
+  		<param-value>c:\\logs\\jsg.log</param-value>
+  	</init-param>
+  </filter>
+  <filter-mapping>
+  	<filter-name>filter02_2</filter-name>
+  	<url-pattern>/ch12/filter02_process.jsp</url-pattern>
+  </filter-mapping>
+  
+  <filter>
+  	<filter-name>LogFilter</filter-name>
+  	<filter-class>filter.LogFilter</filter-class>
+  	
+  	<init-param>
+  		<param-name>filename</param-name>
+  		<param-value>c:\\logs\\jsg.log</param-value>
+  	</init-param>
+  </filter>
+  <filter-mapping>
+  	<filter-name>LogFilter</filter-name>
+  	<url-pattern>/*</url-pattern>
+  </filter-mapping>
+</web-app>
